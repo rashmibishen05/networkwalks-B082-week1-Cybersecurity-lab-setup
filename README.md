@@ -125,7 +125,7 @@ DHCP:          Enabled
 
 ### 📸 NAT Network Configuration
 
-![NAT Network Setup](https://github.com/rashmibishen05/networkwalks-B082-week1-Cybersecurity-lab-setup/blob/103ddf373dd3b2d289f61f467b49f112b027ea1c/NAT%20Network.png.png)
+![NAT Network Setup](https://github.com/rashmibishen05/networkwalks-B082-week1-Cybersecurity-lab-setup/blob/103ddf373dd3b2d289f61f467b49f112b027ea1c/NAT%20Network.png)
 
 The resulting configuration should provide a network similar to:
 
