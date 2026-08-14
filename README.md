@@ -1,64 +1,121 @@
 # 🐉 Kali Linux Lab Setup
 
-> **A clean, isolated Kali Linux lab environment using Oracle VirtualBox**
+> **A practical Kali Linux security lab built with Oracle VirtualBox and a dedicated NAT Network.**
 
-This guide walks through setting up a Kali Linux security lab with a **VirtualBox NAT Network**, configuring Kali's network connectivity, and creating a clean snapshot that can be restored whenever an experiment goes wrong.
+This repository documents the complete setup of a **Kali Linux lab environment** using **Oracle VirtualBox**.
+
+The lab is designed to provide an isolated and reproducible environment for learning **cybersecurity, penetration testing, networking, and security tools** without modifying the host operating system.
 
 ---
 
-## 🗺️ Lab Overview
+## 📋 Table of Contents
+
+* [Lab Overview](#-lab-overview)
+* [Lab Architecture](#️-lab-architecture)
+* [Prerequisites](#-prerequisites)
+* [Step 1 — NAT Network Setup](#1--nat-network-setup)
+* [Step 2 — Kali Linux Setup](#2--kali-linux-setup)
+* [Step 3 — Kali Network Configuration](#3--kali-network-configuration)
+* [Step 4 — Kali Snapshots](#4--kali-snapshots)
+* [Network Verification](#-network-verification)
+* [Final Lab Configuration](#-final-lab-configuration)
+* [Troubleshooting](#-troubleshooting)
+* [Next Steps](#-next-steps)
+
+---
+
+# 🔎 Lab Overview
+
+The lab consists of a Kali Linux virtual machine connected to a custom VirtualBox **NAT Network**.
+
+### ⚙️ Configuration
+
+| Component           | Configuration     |
+| ------------------- | ----------------- |
+| 🖥️ Hypervisor      | Oracle VirtualBox |
+| 🐉 Operating System | Kali Linux 2026.2 |
+| 💻 Architecture     | x64               |
+| 🌐 Network Type     | NAT Network       |
+| 🔌 Network Name     | `Lab-Network`     |
+| 📡 Network          | `10.0.0.0/24`     |
+| 🚪 Gateway          | `10.0.0.1`        |
+| 📦 DHCP             | Enabled           |
+| 🖥️ Kali IP         | `10.0.0.3`        |
+| 🧠 RAM              | 2048 MB           |
+| ⚙️ CPUs             | 2                 |
+| 💾 Disk             | ~80 GB            |
+
+> **Note:** The Kali IP address may change when DHCP is used. `10.0.0.3` is the address observed in this lab configuration.
+
+---
+
+# 🗺️ Lab Architecture
 
 ```text
                          🌐 Internet
-                             │
-                             │
-                    ┌────────▼────────┐
-                    │  Host Machine   │
-                    │    Windows      │
-                    └────────┬────────┘
-                             │
-                    ┌────────▼────────┐
-                    │    VirtualBox   │
-                    │   NAT Network   │
-                    │   Lab-Network   │
-                    │  10.0.0.0/24    │
-                    └────────┬────────┘
-                             │
-                      ┌──────▼──────┐
-                      │ Kali Linux  │
-                      │  10.0.0.3   │
-                      └─────────────┘
+                              │
+                              │
+                    ┌─────────▼─────────┐
+                    │   Host Machine    │
+                    │      Windows      │
+                    └─────────┬─────────┘
+                              │
+                              │
+                    ┌─────────▼─────────┐
+                    │    VirtualBox     │
+                    │    NAT Network    │
+                    │    Lab-Network    │
+                    │   10.0.0.0/24     │
+                    └─────────┬─────────┘
+                              │
+                              │
+                    ┌─────────▼─────────┐
+                    │    🐉 Kali Linux   │
+                    │     10.0.0.3      │
+                    │                   │
+                    │   Gateway:        │
+                    │     10.0.0.1      │
+                    └───────────────────┘
 ```
 
-### 🔧 Lab Configuration
+The NAT Network provides:
 
-| Component       | Configuration     |
-| --------------- | ----------------- |
-| 🖥️ Hypervisor  | Oracle VirtualBox |
-| 🐉 OS           | Kali Linux 2026.2 |
-| 🌐 Network Type | NAT Network       |
-| 🔌 Network Name | `Lab-Network`     |
-| 📡 Network      | `10.0.0.0/24`     |
-| 🚪 Gateway      | `10.0.0.1`        |
-| 📦 DHCP         | Enabled           |
-| 💻 Kali IP      | `10.0.0.3`        |
-| 🧠 RAM          | 2 GB              |
-| ⚙️ CPUs         | 2                 |
-| 💾 Disk         | ~80 GB            |
+* 🌐 Internet connectivity
+* 🔄 Communication between lab VMs
+* 🛡️ Separation from the physical LAN
+* 🧪 A controlled environment for security testing
 
 ---
 
-# 01 · 🌐 NAT Network Setup
+# 🛠️ Prerequisites
 
-The first step is to create an isolated VirtualBox network for the lab.
+Before starting, make sure you have:
 
-### Open VirtualBox Network Manager
+* [ ] A Windows/Linux/macOS host machine
+* [ ] Oracle VirtualBox installed
+* [ ] Kali Linux VirtualBox image or ISO
+* [ ] At least **4 GB RAM** available for the VM and host
+* [ ] At least **80 GB free disk space**
+* [ ] Hardware virtualization enabled in BIOS/UEFI
+* [ ] Basic familiarity with Linux terminal commands
 
-In **Oracle VirtualBox Manager**, navigate to:
+---
 
-**Network → NAT Networks**
+# 1 · 🌐 NAT Network Setup
 
-Create a new NAT Network with the following configuration:
+The first step is to create a dedicated NAT Network for the lab.
+
+## Create the NAT Network
+
+Open **Oracle VirtualBox Manager**.
+
+Navigate to:
+
+```text
+Network → NAT Networks
+```
+
+Create a new NAT Network with:
 
 ```text
 Name:          Lab-Network
@@ -66,11 +123,15 @@ IPv4 Prefix:   10.0.0.0/24
 DHCP:          Enabled
 ```
 
-Your network should look similar to:
+### 📸 NAT Network Configuration
+
+![NAT Network Setup](NAT Network.png)
+
+The resulting configuration should provide a network similar to:
 
 ```text
 ┌─────────────────────────────────────┐
-│          Lab-Network                │
+│           Lab-Network               │
 ├─────────────────────────────────────┤
 │ Network:     10.0.0.0/24            │
 │ Gateway:     10.0.0.1               │
@@ -78,24 +139,37 @@ Your network should look similar to:
 └─────────────────────────────────────┘
 ```
 
-### 💡 Why NAT Network?
+## 💡 Why NAT Network?
 
-A **NAT Network** allows lab VMs to:
+A NAT Network is useful for a cybersecurity lab because it allows multiple virtual machines to communicate while still providing internet access.
 
-* 🌐 Access the internet
-* 🔄 Communicate with other VMs on the same lab network
-* 🛡️ Remain separated from the physical LAN
-* 🧪 Provide a controlled environment for security testing
+For example:
 
-> **Tip:** Use **NAT Network**, not the regular **NAT** adapter mode, when you want multiple lab VMs to communicate with one another.
+```text
+                 🌐 Internet
+                      │
+                VirtualBox NAT
+                      │
+              ┌───────┴───────┐
+              │               │
+          🐉 Kali VM       🎯 Target VM
+          10.0.0.3          10.0.0.x
+              │               │
+              └───────┬───────┘
+                      │
+                Lab-Network
+                10.0.0.0/24
+```
+
+> ⚠️ **Important:** Use **NAT Network**, not regular **NAT**, if you want multiple lab VMs to communicate with each other.
 
 ---
 
-# 02 · 🐉 Kali Linux Setup
+# 2 · 🐉 Kali Linux Setup
 
-## Create / Import the Kali VM
+## Create or Import the Kali VM
 
-Create a new VM or import the official Kali VirtualBox image.
+Create a new virtual machine or import the Kali Linux VirtualBox image.
 
 Recommended configuration:
 
@@ -107,37 +181,54 @@ Processors:  2
 Disk:        ~80 GB
 ```
 
-### ⚙️ Configure the Network Adapter
+### 📸 Kali VM Configuration
 
-Open:
-
-**Kali VM → Settings → Network → Adapter 1**
-
-Configure:
-
-```text
-Enable Adapter:     ✓
-Attached to:        NAT Network
-Network Name:       Lab-Network
-```
-
-The important part is:
-
-```text
-Adapter 1
-   │
-   └── NAT Network
-          │
-          └── Lab-Network
-```
-
-Start the Kali VM once the configuration is complete.
+![Kali Linux Setup](Kali Configs.png)
+![Kali Linux Setup](Kali Desktop.png)
 
 ---
 
-# 03 · 🔌 Kali Network Configuration
+## Configure the Network Adapter
 
-After Kali boots, open a terminal.
+Open:
+
+```text
+Kali VM
+   ↓
+Settings
+   ↓
+Network
+   ↓
+Adapter 1
+```
+
+Configure the adapter as:
+
+```text
+Enable Network Adapter:  ✓
+Attached to:             NAT Network
+Name:                    Lab-Network
+```
+
+The final configuration should look like:
+
+```text
+Adapter 1
+    │
+    └── NAT Network
+            │
+            └── Lab-Network
+```
+
+Start the Kali VM after completing the configuration.
+
+---
+
+# 3 · 🔌 Kali Network Configuration
+
+After Kali Linux starts, open a terminal.
+
+---
 
 ## Check the Network Interface
 
@@ -167,7 +258,7 @@ enp0s3
 
 ---
 
-## Check the Kali IP
+## Check the IP Address
 
 Run:
 
@@ -175,13 +266,13 @@ Run:
 ip addr
 ```
 
-The lab configuration should provide an address in:
+Kali should receive an address from:
 
 ```text
 10.0.0.0/24
 ```
 
-Example:
+In this lab, the observed address is:
 
 ```text
 10.0.0.3
@@ -197,7 +288,7 @@ Run:
 ip route
 ```
 
-You should see something similar to:
+You should see a route similar to:
 
 ```text
 default via 10.0.0.1
@@ -215,49 +306,70 @@ Run:
 cat /etc/resolv.conf
 ```
 
-Confirm that a working DNS server is configured.
+A working DNS server should be configured.
 
-Example from this lab:
+The DNS server observed in this setup is:
 
 ```text
 192.168.1.1
 ```
 
+> **Note:** DNS configuration can vary depending on the host network and VirtualBox configuration.
+
 ---
 
-## 🧪 Test Connectivity
+# 🧪 Network Verification
 
-### 1. Test the VirtualBox Gateway
+After configuring the network, verify connectivity in three stages.
+
+## 1. Test the Gateway
 
 ```bash
 ping -c 4 10.0.0.1
 ```
 
-### 2. Test Internet Connectivity
+Expected:
+
+```text
+Gateway connectivity ✓
+```
+
+---
+
+## 2. Test Internet Connectivity
 
 ```bash
 ping -c 4 8.8.8.8
 ```
 
-### 3. Test DNS Resolution
+Expected:
+
+```text
+Internet connectivity ✓
+```
+
+---
+
+## 3. Test DNS Resolution
 
 ```bash
 ping -c 4 google.com
 ```
 
-A successful setup should pass all three tests:
+Expected:
 
 ```text
-Gateway      ✓
-Internet     ✓
-DNS          ✓
+DNS resolution ✓
 ```
 
 ---
 
-## 🔎 Quick Network Verification
+![Network Connectivity](Check Connectivity.png)
 
-Use these commands whenever you need to troubleshoot the lab:
+
+## 🔍 Quick Verification Commands
+
+Run:
 
 ```bash
 ip addr
@@ -269,7 +381,7 @@ Expected configuration:
 
 ```text
 ┌─────────────────────────────────────┐
-│       Kali Network Settings         │
+│       Kali Network Configuration    │
 ├─────────────────────────────────────┤
 │ IP Address : 10.0.0.3               │
 │ Network    : 10.0.0.0/24            │
@@ -278,17 +390,17 @@ Expected configuration:
 └─────────────────────────────────────┘
 ```
 
-> ⚠️ **Note:** With DHCP enabled, the Kali IP address may change after rebooting. If your lab requires a predictable IP, use a DHCP reservation or configure a static address.
+---
+
+# 4 · 📸 Kali Snapshots
+
+Snapshots are extremely useful when working with a cybersecurity lab.
+
+Before experimenting with tools, network configurations, or vulnerable applications, create a snapshot so that you can quickly return to a known-good state.
 
 ---
 
-# 04 · 📸 Kali Snapshots
-
-Snapshots are one of the most useful features of a virtual security lab.
-
-Before installing tools, changing network settings, or running potentially disruptive experiments, create a snapshot.
-
-## 🧼 Create the Baseline Snapshot
+## Create the Baseline Snapshot
 
 Once Kali is completely configured:
 
@@ -298,22 +410,24 @@ Once Kali is completely configured:
 4. Open **Snapshots**.
 5. Create a new snapshot.
 
-Use:
+Use the following name:
 
 ```text
-Name:
 Fresh Installation
 ```
 
-Suggested description:
+Recommended description:
 
 ```text
-Clean Kali Linux installation.
-Lab-Network configured and network connectivity verified.
-Use as the baseline recovery point.
+Clean Kali Linux installation with Lab-Network configured
+and network connectivity verified.
 ```
 
-Your snapshot tree should look like:
+### 📸 Kali Snapshot
+
+![Kali Snapshots](images/04-snapshots.png)
+
+The snapshot structure should look similar to:
 
 ```text
 📸 Fresh Installation
@@ -324,7 +438,9 @@ Your snapshot tree should look like:
 
 ## 🔬 Recommended Snapshot Strategy
 
-Create a new snapshot before major changes:
+Create a snapshot before making major changes.
+
+Example:
 
 ```text
 📸 Fresh Installation
@@ -336,106 +452,190 @@ Create a new snapshot before major changes:
         └── 📸 Before Lab Exercise
 ```
 
-Good snapshot names should describe **what state the VM is in**, not just the date.
-
-Examples:
+Useful snapshot names include:
 
 ```text
 Fresh Installation
-Before Metasploit Lab
-Before Network Configuration
 Before Tool Installation
+Before Network Configuration
+Before Metasploit Lab
+Before Network Testing
 Clean Lab Baseline
 ```
 
 ---
 
-## ♻️ Restore the Lab
+## ♻️ Restore a Snapshot
 
-If an experiment breaks the VM:
+If an experiment breaks the Kali environment:
 
-1. Power off Kali.
+1. Power off the VM.
 2. Open **VirtualBox → Snapshots**.
-3. Select the snapshot you want.
+3. Select the desired snapshot.
 4. Click **Restore**.
 5. Start Kali again.
 
-For example:
+Example:
 
 ```text
-Experiment
-    │
-    ▼
-💥 Something breaks
-    │
-    ▼
-♻️ Restore "Fresh Installation"
-    │
-    ▼
-🐉 Clean Kali Environment
+        🧪 Lab Experiment
+               │
+               ▼
+          💥 Something
+             breaks
+               │
+               ▼
+       ♻️ Restore Snapshot
+               │
+               ▼
+      🐉 Clean Kali System
 ```
+
+---
+
+# 📁 Repository Structure
+
+A clean repository structure is recommended:
+
+```text
+kali-linux-lab/
+│
+├── README.md
+│
+└── images/
+    │
+    ├── 01-nat-setup.png
+    ├── 02-kali-setup.png
+    ├── 03-network-config.png
+    └── 04-snapshots.png
+```
+
+The images are referenced in the README using relative paths:
+
+```markdown
+![NAT Network Setup](images/01-nat-setup.png)
+```
+
+This allows GitHub to automatically render the images when viewing the README.
 
 ---
 
 # ✅ Final Setup Checklist
 
-### 🌐 Network
+## 🌐 NAT Network
 
 * [ ] Create `Lab-Network`
 * [ ] Configure `10.0.0.0/24`
 * [ ] Enable DHCP
 * [ ] Verify gateway `10.0.0.1`
 
-### 🐉 Kali
+## 🐉 Kali Linux
 
 * [ ] Install/import Kali Linux
 * [ ] Configure Adapter 1
 * [ ] Attach Adapter 1 to `Lab-Network`
-* [ ] Boot Kali successfully
+* [ ] Start Kali successfully
 
-### 🔌 Connectivity
+## 🔌 Network
 
 * [ ] Verify Kali IP address
 * [ ] Verify default gateway
 * [ ] Verify DNS
 * [ ] Ping `10.0.0.1`
 * [ ] Ping `8.8.8.8`
-* [ ] Test `google.com`
+* [ ] Test DNS with `google.com`
 
-### 📸 Snapshots
+## 📸 Snapshots
 
 * [ ] Shut down Kali
 * [ ] Create `Fresh Installation`
-* [ ] Add a useful snapshot description
+* [ ] Add a useful description
 * [ ] Create additional snapshots before major lab changes
 
 ---
 
-# 🎯 Final Result
+# 🏁 Final Lab Configuration
 
-At the end of the setup, you should have:
+Once everything is complete, the lab should look like this:
 
 ```text
-                 🌐 INTERNET
-                     │
-                     ▼
-             ┌───────────────┐
-             │   VirtualBox  │
-             │ NAT Network   │
-             └───────┬───────┘
-                     │
-              Lab-Network
-               10.0.0.0/24
-                     │
-                     ▼
-             ┌───────────────┐
-             │  🐉 KALI LINUX │
-             │   10.0.0.3    │
-             └───────┬───────┘
-                     │
-                     ▼
-             📸 Fresh Installation
-                 Snapshot
+                         🌐 INTERNET
+                              │
+                              ▼
+                    ┌─────────────────┐
+                    │   HOST MACHINE  │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │    VirtualBox   │
+                    │   NAT Network   │
+                    └────────┬────────┘
+                             │
+                    ┌────────▼────────┐
+                    │   Lab-Network   │
+                    │   10.0.0.0/24   │
+                    │                 │
+                    │ Gateway         │
+                    │ 10.0.0.1        │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │   🐉 KALI LINUX  │
+                    │                 │
+                    │   10.0.0.3      │
+                    └────────┬────────┘
+                             │
+                             ▼
+                    📸 Fresh Installation
+                       Snapshot
 ```
 
-> **🏁 Lab Ready:** Kali is configured, networking is verified, and a clean recovery point is available. You can now safely build additional lab machines and begin your security exercises.
+---
+
+# 🚀 Next Steps
+
+Once the base Kali environment is ready, the lab can be expanded with additional virtual machines.
+
+Possible additions:
+
+* 🎯 Vulnerable Linux targets
+* 🪟 Windows test machines
+* 🌐 Web application targets
+* 🗄️ Database servers
+* 🔐 Active Directory lab
+* 🧪 Capture-the-Flag environments
+* 🔎 Network monitoring tools
+* 🛡️ Defensive security tools
+
+The recommended approach is to keep the **Fresh Installation** snapshot untouched and create additional snapshots as the lab evolves.
+
+---
+
+## ⚠️ Responsible Use
+
+This lab should be used only for **authorized security testing, education, and experimentation**.
+
+Only test systems that you own or have explicit permission to assess.
+
+---
+
+## ⭐ Lab Status
+
+```text
+┌────────────────────────────────────────┐
+│          🐉 KALI LAB STATUS            │
+├────────────────────────────────────────┤
+│                                        │
+│  🌐 NAT Network       ✅ Configured    │
+│  🐉 Kali Linux        ✅ Installed     │
+│  🔌 Network           ✅ Verified      │
+│  📸 Snapshot          ✅ Created       │
+│                                        │
+│  🚀 LAB READY                         │
+│                                        │
+└────────────────────────────────────────┘
+```
+
+> **Happy Learning & Stay Ethical! 🐉🔐**
