@@ -364,7 +364,7 @@ DNS resolution ✓
 
 ---
 
-![Network Connectivity](Check Connectivity.png)
+![Network Connectivity](https://github.com/rashmibishen05/networkwalks-B082-week1-Cybersecurity-lab-setup/blob/4e4df65668718f7c0c232eb409c7ed2abc01bbfe/Check%20Connectivity.png)
 
 
 ## 🔍 Quick Verification Commands
