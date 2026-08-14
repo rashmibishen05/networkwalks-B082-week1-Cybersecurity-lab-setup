@@ -125,7 +125,7 @@ DHCP:          Enabled
 
 ### 📸 NAT Network Configuration
 
-![NAT Network Setup](NAT Network.png)
+![NAT Network Setup](https://github.com/rashmibishen05/networkwalks-B082-week1-Cybersecurity-lab-setup/blob/103ddf373dd3b2d289f61f467b49f112b027ea1c/NAT%20Network.png.png)
 
 The resulting configuration should provide a network similar to:
 
@@ -183,8 +183,8 @@ Disk:        ~80 GB
 
 ### 📸 Kali VM Configuration
 
-![Kali Linux Setup](Kali Configs.png)
-![Kali Linux Setup](Kali Desktop.png)
+![Kali Linux Setup](https://github.com/rashmibishen05/networkwalks-B082-week1-Cybersecurity-lab-setup/blob/103ddf373dd3b2d289f61f467b49f112b027ea1c/Kali%20Configs.png)
+![Kali Linux Setup](https://github.com/rashmibishen05/networkwalks-B082-week1-Cybersecurity-lab-setup/blob/103ddf373dd3b2d289f61f467b49f112b027ea1c/Kali%20Desktop.png)
 
 ---
 
@@ -425,7 +425,7 @@ and network connectivity verified.
 
 ### 📸 Kali Snapshot
 
-![Kali Snapshots](images/04-snapshots.png)
+![Kali Snapshots](https://github.com/rashmibishen05/networkwalks-B082-week1-Cybersecurity-lab-setup/blob/103ddf373dd3b2d289f61f467b49f112b027ea1c/Lab%20Snapshots.png)
 
 The snapshot structure should look similar to:
 
@@ -490,33 +490,6 @@ Example:
                ▼
       🐉 Clean Kali System
 ```
-
----
-
-# 📁 Repository Structure
-
-A clean repository structure is recommended:
-
-```text
-kali-linux-lab/
-│
-├── README.md
-│
-└── images/
-    │
-    ├── 01-nat-setup.png
-    ├── 02-kali-setup.png
-    ├── 03-network-config.png
-    └── 04-snapshots.png
-```
-
-The images are referenced in the README using relative paths:
-
-```markdown
-![NAT Network Setup](images/01-nat-setup.png)
-```
-
-This allows GitHub to automatically render the images when viewing the README.
 
 ---
 
